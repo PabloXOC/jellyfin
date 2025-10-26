@@ -1,0 +1,271 @@
+/* ElegantFin — Balanced (optimized) version
+   Based on ElegantFin v25.08.08 (trimmed & optimized for performance)
+   - Reduced heavy blurs, large gradients, and remote font loads
+   - Collapsed repetitive media queries
+   - Kept color palette, spacing, and core layout rules
+*/
+
+/* -------------------------
+   Theme variables (core)
+   ------------------------- */
+:root{
+  --elegantFinFooterText:"ElegantFin v25.08.08 (balanced)";
+  color-scheme:dark;
+
+  /* Colors */
+  --darker:#111827;
+  --lighter:#1d2635;
+  --headerColor:rgba(30,40,54,.85);
+  --drawerColor:rgba(30,40,54,.9);
+  --borderColor:hsl(214,13%,32%);
+  --darkerBorderColor:hsl(214,13%,22%);
+  --lighterBorderColor:hsla(0,0%,100%,.16);
+  --textColor:rgb(209,213,219);
+  --dimTextColor:rgb(156,163,175);
+  --uiAccentColor:rgb(117,111,226);
+  --activeColor:rgb(119,91,244);
+  --activeColorAlpha:rgba(119,91,244,.9);
+
+  /* Layout / sizing */
+  --largerRadius:1.25em;
+  --largeRadius:1em;
+  --smallRadius:.5em;
+  --smallerRadius:.375em;
+  --borderWidth:.06em;
+  --borderWidthDouble:.12em;
+  --sidePadding:3.3%;
+  --itemColumnGap:1em;
+
+  /* Backgrounds (simplified) */
+  --backgroundSolid:var(--darker);
+  --cardBackground:linear-gradient(180deg,var(--darker) 0%, var(--lighter) 100%);
+
+  /* Shadows / minor effects (cheap) */
+  --shadow:0 .12em .2em rgba(0,0,0,.35);
+
+  /* Misc */
+  --iconPack: "Material Icons", sans-serif; /* fallback; don't force remote font load here */
+  --elevBlur: none; /* removed heavy blur */
+}
+
+/* -------------------------
+   Base & resets
+   ------------------------- */
+html {
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background-color: var(--backgroundSolid);
+  color: var(--textColor);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  line-height:1.35;
+  box-sizing:border-box;
+}
+
+*,
+*::before,
+*::after { box-sizing:inherit; }
+
+::selection { background:var(--activeColorAlpha); }
+
+/* -------------------------
+   Simple header/footer/drawers
+   ------------------------- */
+.MuiAppBar-root,
+.appheader,
+.appfooter {
+  background:var(--headerColor);
+  color:var(--textColor);
+  border-bottom: calc(var(--borderWidth) * 1px) solid var(--borderColor);
+  box-shadow:var(--shadow);
+}
+
+/* Drawer */
+.MuiDrawer-paper,
+.mainDrawer {
+  background:var(--drawerColor);
+  border-right: calc(var(--borderWidth) * 1px) solid var(--borderColor);
+}
+
+/* Footer small tag */
+.dashboardFooter::after{
+  content:var(--elegantFinFooterText);
+  font-size:.75em;
+  color:var(--dimTextColor);
+  display:inline-block;
+  margin-left:.5em;
+}
+
+/* -------------------------
+   Card / grid basics (kept look)
+   ------------------------- */
+.card,
+.cardBox,
+.cardScalable,
+.visualCardBox {
+  background:var(--cardBackground);
+  border-radius:var(--largeRadius);
+  border: calc(var(--borderWidthDouble) * 1px) solid var(--darkerBorderColor);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+
+/* Slight hover emphasis but cheap */
+.card.card-hoverable:hover,
+.card.card-hoverable:focus-within {
+  transform: translateY(-.15em);
+  box-shadow: 0 .25em .45em rgba(0,0,0,.45);
+}
+
+/* Cards sizing in grid — simple, responsive */
+.itemsContainer { gap: var(--itemColumnGap); display:grid; grid-auto-flow:row dense; }
+
+/* Responsive card columns (kept concise) */
+@media (min-width:1200px){ .itemsContainer{ grid-template-columns: repeat(6, 1fr); } }
+@media (min-width:900px) and (max-width:1199px){ .itemsContainer{ grid-template-columns: repeat(4, 1fr); } }
+@media (min-width:600px) and (max-width:899px){ .itemsContainer{ grid-template-columns: repeat(3, 1fr); } }
+@media (max-width:599px){ .itemsContainer{ grid-template-columns: repeat(2, 1fr); } }
+
+/* -------------------------
+   Backdrop / detail images (cheap)
+   ------------------------- */
+/* Replace heavy blurred backdrop with subtle overlay */
+.backdropContainer,
+.backgroundContainer {
+  background: linear-gradient(180deg, rgba(0,0,0,.75), rgba(0,0,0,.45));
+  color:var(--textColor);
+}
+
+/* Item backdrop simplified */
+.itemBackdrop {
+  background-size:cover;
+  background-position:center;
+  filter: none; /* removed blur */
+  min-height: 28vh;
+}
+
+/* When a backdrop image is present, keep a small gentle overlay only */
+.backdropImage:after {
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.25));
+  pointer-events:none;
+}
+
+/* -------------------------
+   Buttons & interactive
+   ------------------------- */
+.emby-button,
+.button-flat,
+.fab,
+.raised,
+.detailButton {
+  background:transparent;
+  color:var(--textColor);
+  border-radius:var(--smallRadius);
+  border: 1px solid var(--lighterBorderColor);
+  padding:.5em .75em;
+  transition: transform .08s ease, background-color .12s ease;
+}
+
+.button-submit { background: var(--uiAccentColor); color: #fff; border-color: rgba(0,0,0,.08); }
+.btnPlay.detailButton { background: var(--textColor); color: #000; border-radius: 2em; padding: .6em 1.2em; }
+
+/* focus/active improvements without heavy outlines */
+.emby-button:focus,
+.emby-button:active,
+.button-flat:focus { outline: none; box-shadow: 0 0 0 3px rgba(117,111,226,.12); transform: translateY(-.05em); }
+
+/* -------------------------
+   Progress / sliders
+   ------------------------- */
+progress,
+.mdl-slider-background-flex,
+.itemProgressBar {
+  background-color: rgba(255,255,255,.06);
+  border-radius: var(--smallRadius);
+  border: 1px solid rgba(255,255,255,.03);
+}
+
+.mdl-slider-background-lower,
+.playbackProgress>div { background-color: var(--uiAccentColor); }
+
+/* -------------------------
+   Lists & items
+   ------------------------- */
+.listItem,
+.navMenuOption {
+  background:transparent;
+  border-radius: .7em;
+  padding:.45em;
+}
+
+.listItem:hover { background: rgba(255,255,255,.04); }
+
+/* -------------------------
+   Detail page / typography
+   ------------------------- */
+.infoWrapper h1.itemName,
+.infoWrapper h1.parentName {
+  font-size: clamp(1.4rem, 3.8vw, 3.6rem);
+  font-weight: 300;
+  color: var(--textColor);
+  word-break: break-word;
+}
+
+.detail-clamp-text { color:var(--dimTextColor); display:block; line-height:1.4; max-height:4.2em; overflow:hidden; }
+
+/* -------------------------
+   Reduced motion / animation
+   ------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; transform: none !important; }
+}
+
+/* -------------------------
+   Form inputs / selects
+   ------------------------- */
+.emby-select-withcolor,
+.emby-select,
+.emby-input,
+.emby-textarea {
+  background-color: rgba(255,255,255,.03);
+  border: 1px solid var(--lighterBorderColor);
+  border-radius: var(--smallRadius);
+  padding:.45em .6em;
+  color:var(--textColor);
+}
+
+/* -------------------------
+   Icons / fonts (no remote fetch)
+   ------------------------- */
+/* Use system fallbacks; if you want Material Icons load them once externally */
+.material-icons,
+.material-icons-round { font-family: var(--iconPack); font-size: 1.15em; vertical-align: middle; }
+
+/* -------------------------
+   Misc / helpers
+   ------------------------- */
+.cardFooter,
+.innerCardFooter {
+  background: linear-gradient(180deg, rgba(0,0,0,.65), transparent);
+  padding:.65em;
+  color:var(--textColor);
+}
+
+/* Small responsive tweaks */
+@media (max-width:48em){
+  .detailPagePrimaryContainer { padding:.5em var(--sidePadding); }
+  .card { border-radius: .75em; }
+  .btnPlay.detailButton { min-width:unset; width:100%; }
+}
+
+/* -------------------------
+   Accessibility tweaks
+   ------------------------- */
+:focus { outline: none; box-shadow: 0 0 0 3px rgba(119,91,244,.14); }
+
+/* -------------------------
+   End
+   ------------------------- */
